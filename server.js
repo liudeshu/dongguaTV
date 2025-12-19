@@ -11,6 +11,7 @@ const { promisify } = require('util');
 const pipeline = promisify(stream.pipeline);
 
 const app = express();
+const compression = require('compression');
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'db.json');
 const TEMPLATE_FILE = path.join(__dirname, 'db.template.json');
@@ -109,9 +110,13 @@ class CacheManager {
 
 const cacheManager = new CacheManager(CACHE_TYPE);
 
+app.use(compression());
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static('public', {
+    maxAge: '7d', // 延长至 7 天
+    etag: true
+}));
 
 // ========== 路由定义 ==========
 

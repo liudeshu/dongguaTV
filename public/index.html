@@ -1164,6 +1164,9 @@
             padding: 0 5%;
             margin-bottom: 40px;
             min-height: 100px;
+            /* 性能优化：跳过不可见区域的渲染 */
+            content-visibility: auto;
+            contain-intrinsic-size: 1px 400px;
             /* 确保 Intersection Observer 能检测到进入视口 */
         }
 
@@ -2434,7 +2437,8 @@
             </div>
             <!-- 动态生成的榜单 Rows -->
             <div class="section-container animate__animated animate__fadeInUp"
-                v-for="(config, key, index) in rowConfigs" :key="key" :ref="key + '-section'" :data-row-key="key">
+                v-for="(config, key, index) in rowConfigs" :key="key" :ref="key + '-section'" :data-row-key="key"
+                :data-key="key">
                 <!-- 标题区（始终显示，用于懒加载触发） -->
                 <div class="section-header" style="display: flex; align-items: center;">
                     <div class="section-line"></div>
@@ -3041,6 +3045,9 @@
                 window.startApp = () => {
                     return this.initApp();
                 };
+
+                // 初始化懒加载观察器
+                this.initLazyObserver();
             },
             computed: {
                 groupedList() {
@@ -3770,12 +3777,40 @@
 
                     console.log(`[设备检测] 宽度=${viewportWidth}, 触摸=${isTouchDevice}, UA移动=${isMobileUA}, 判定=${isMobile ? '移动端' : '桌面端'}`);
 
-                    // 统一使用直接加载所有榜单
-                    console.log(`[榜单加载] 直接加载所有 ${keys.length} 个榜单`);
-                    keys.forEach((key, index) => {
+                    // 混合加载前三个关键榜单（Hero 已经在 fetchHero 中加载）
+                    console.log(`[榜单加载] 优先加载关键榜单`);
+                    const priorityKeys = ['randomRow', 'movieRow', 'tvRow'];
+                    priorityKeys.forEach((key, index) => {
                         setTimeout(() => {
                             this.fetchRow(key);
-                        }, index * 200);
+                        }, index * 100);
+                    });
+                },
+
+                // 初始化懒加载观察器
+                initLazyObserver() {
+                    this.$nextTick(() => {
+                        const options = {
+                            root: null,
+                            rootMargin: '200px', // 提前 200px 加载
+                            threshold: 0.01
+                        };
+
+                        const observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting) {
+                                    const key = entry.target.getAttribute('data-key');
+                                    if (key && !this.rowLists[key]) {
+                                        console.log(`[懒加载] 进入视口: ${key}`);
+                                        this.fetchRow(key);
+                                    }
+                                }
+                            });
+                        }, options);
+
+                        // 观察所有带 data-key 的 section
+                        const sections = document.querySelectorAll('.section-container[data-key]');
+                        sections.forEach(s => observer.observe(s));
                     });
                 },
 
