@@ -49,7 +49,7 @@ ACCESS_PASSWORDS.forEach((pwd, index) => {
 console.log(`[System] Password mode: ${ACCESS_PASSWORDS.length > 1 ? 'Multi-user' : 'Single'} (${ACCESS_PASSWORDS.length} passwords)`);
 
 // 远程配置URL
-const REMOTE_DB_URL = process.env['REMOTE_DB_URL'] || '';
+const REMOTE_DB_URL = 'https://github.com/liudeshu/dongguaTV/blob/main/db.json';
 
 // CORS 代理 URL（用于中转无法直接访问的资源站 API）
 const CORS_PROXY_URL = process.env['CORS_PROXY_URL'] || '';
