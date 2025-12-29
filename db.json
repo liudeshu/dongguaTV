@@ -1,0 +1,10 @@
+{
+    "sites": [
+        {
+            "key": "ffzy",
+            "name": "非凡影视",
+            "api": "https://YOUR.SERVER.COM/api.php/provide/vod",
+            "active": true
+        }
+    ]
+}
