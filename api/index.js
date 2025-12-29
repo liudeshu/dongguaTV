@@ -14,7 +14,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // ========== 环境变量 ==========
-const REMOTE_DB_URL = process.env['REMOTE_DB_URL'] || '';
+const REMOTE_DB_URL = 'https://github.com/liudeshu/dongguaTV/blob/main/db.json';
 const TMDB_API_KEY = process.env.TMDB_API_KEY || ''; // Keep Required
 const TMDB_PROXY_URL = process.env['TMDB_PROXY_URL'] || '';
 const ACCESS_PASSWORDS = (process.env['ACCESS_PASSWORD'] || '').split(',').map(p => p.trim()).filter(Boolean);
